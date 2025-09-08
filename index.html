@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITMS - Integrated Track Monitoring System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1 class="header-title">ITMS Dashboard</h1>
+            <div class="header-subtitle">Integrated Track Monitoring System</div>
+        </div>
+        <div class="header-center">
+            <div class="system-status">
+                <div class="status-item">
+                    <span class="status-label">Recording:</span>
+                    <span class="status-value" id="recordingStatus">Active</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Speed:</span>
+                    <span class="status-value" id="currentSpeed">85 km/h</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Chainage:</span>
+                    <span class="status-value" id="currentChainage">KM 1247.350</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="current-time" id="currentTime">10:45:32</div>
+            <div class="date-display" id="currentDate">Friday, Sep 05, 2025</div>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <button class="nav-link active" data-module="live-monitoring">
+                        <span class="nav-icon">📊</span>
+                        Live Monitoring
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-module="gps-tracking">
+                        <span class="nav-icon">🗺️</span>
+                        GPS Tracking
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-module="alerts">
+                        <span class="nav-icon">⚠️</span>
+                        Alerts
+                        <span class="alert-count" id="alertCount">3</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-module="track-analysis">
+                        <span class="nav-icon">📈</span>
+                        Track Analysis
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-module="system-control">
+                        <span class="nav-icon">⚙️</span>
+                        System Control
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-module="system-diagrams">
+                        <span class="nav-icon">🏗️</span>
+                        System Diagrams
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Branding Section in Sidebar -->
+            <div class="sidebar-footer">
+                <div class="branding">
+                    <div class="brand-logo">🚄</div>
+                    <div class="brand-text">
+                        <div class="brand-title">Team AAMCA</div>
+                        <div class="brand-subtitle">Railway Solutions</div>
+                        <div class="brand-website">
+                            <a href="https://www.teamaamca.ai" target="_blank">www.teamaamca.ai</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Live Monitoring Module -->
+            <div id="live-monitoring" class="module active">
+                <div class="module-header">
+                    <h2>Live Track Monitoring</h2>
+                    <div class="sensor-indicators">
+                        <div class="sensor-status" data-sensor="laser">Laser</div>
+                        <div class="sensor-status" data-sensor="accelerometer">Accel</div>
+                        <div class="sensor-status" data-sensor="gps">GPS</div>
+                        <div class="sensor-status" data-sensor="camera">Camera</div>
+                        <div class="sensor-status" data-sensor="lidar">LiDAR</div>
+                        <div class="sensor-status" data-sensor="imu">IMU</div>
+                    </div>
+                </div>
+
+                <div class="monitoring-grid">
+                    <div class="parameter-cards">
+                        <div class="parameter-card">
+                            <div class="parameter-header">
+                                <h3>Track Gauge</h3>
+                                <span class="parameter-status normal">Normal</span>
+                            </div>
+                            <div class="parameter-value" id="gaugeValue">1435.2</div>
+                            <div class="parameter-unit">mm</div>
+                            <div class="parameter-threshold">Threshold: 1440 mm</div>
+                        </div>
+
+                        <div class="parameter-card">
+                            <div class="parameter-header">
+                                <h3>Alignment</h3>
+                                <span class="parameter-status normal">Normal</span>
+                            </div>
+                            <div class="parameter-value" id="alignmentValue">2.1</div>
+                            <div class="parameter-unit">mm</div>
+                            <div class="parameter-threshold">Threshold: 10 mm</div>
+                        </div>
+
+                        <div class="parameter-card">
+                            <div class="parameter-header">
+                                <h3>Unevenness</h3>
+                                <span class="parameter-status normal">Normal</span>
+                            </div>
+                            <div class="parameter-value" id="unevennessValue">3.8</div>
+                            <div class="parameter-unit">mm</div>
+                            <div class="parameter-threshold">Threshold: 15 mm</div>
+                        </div>
+
+                        <div class="parameter-card">
+                            <div class="parameter-header">
+                                <h3>Twist</h3>
+                                <span class="parameter-status normal">Normal</span>
+                            </div>
+                            <div class="parameter-value" id="twistValue">1.2</div>
+                            <div class="parameter-unit">mm</div>
+                            <div class="parameter-threshold">Threshold: 8 mm</div>
+                        </div>
+
+                        <div class="parameter-card">
+                            <div class="parameter-header">
+                                <h3>Cross Level</h3>
+                                <span class="parameter-status normal">Normal</span>
+                            </div>
+                            <div class="parameter-value" id="crossLevelValue">4.5</div>
+                            <div class="parameter-unit">mm</div>
+                            <div class="parameter-threshold">Threshold: 12 mm</div>
+                        </div>
+
+                        <div class="parameter-card speed-card">
+                            <div class="parameter-header">
+                                <h3>Vehicle Speed</h3>
+                                <span class="parameter-status normal">Normal</span>
+                            </div>
+                            <div class="parameter-value" id="speedValue">85</div>
+                            <div class="parameter-unit">km/h</div>
+                            <div class="parameter-threshold">Max: 200 km/h</div>
+                        </div>
+                    </div>
+
+                    <div class="charts-container">
+                        <div class="chart-card">
+                            <h3>Track Parameters Over Distance</h3>
+                            <div class="chart-container" style="position: relative; height: 300px;">
+                                <canvas id="parametersChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GPS Tracking Module -->
+            <div id="gps-tracking" class="module hidden">
+                <div class="module-header">
+                    <h2>GPS Tracking & Location</h2>
+                    <div class="gps-coordinates">
+                        <span class="coord-item">Lat: <span id="latitude">28.6139</span>°</span>
+                        <span class="coord-item">Lon: <span id="longitude">77.2090</span>°</span>
+                        <span class="coord-item">Alt: <span id="altitude">216</span>m</span>
+                    </div>
+                </div>
+
+                <div class="gps-grid">
+                    <div class="map-container">
+                        <div id="trackMap" style="height: 500px; width: 100%;"></div>
+                    </div>
+                    
+                    <div class="location-info">
+                        <div class="info-card">
+                            <h3>Current Position</h3>
+                            <div class="info-item">
+                                <span class="info-label">Chainage:</span>
+                                <span class="info-value" id="mapChainage">KM 1247.350</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Heading:</span>
+                                <span class="info-value" id="heading">045°</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Distance Traveled:</span>
+                                <span class="info-value" id="distanceTraveled">24.7 km</span>
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>Nearby Landmarks</h3>
+                            <div class="landmark-item">
+                                <span class="landmark-name">New Delhi Jn.</span>
+                                <span class="landmark-distance">2.3 km ahead</span>
+                            </div>
+                            <div class="landmark-item">
+                                <span class="landmark-name">Tilak Bridge</span>
+                                <span class="landmark-distance">5.7 km ahead</span>
+                            </div>
+                            <div class="landmark-item">
+                                <span class="landmark-name">Anand Vihar</span>
+                                <span class="landmark-distance">12.1 km ahead</span>
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>Active Faults</h3>
+                            <div class="fault-item critical">
+                                <span class="fault-location">KM 1244.650</span>
+                                <span class="fault-type">Alignment</span>
+                                <span class="fault-distance">2.7 km behind</span>
+                            </div>
+                            <div class="fault-item high">
+                                <span class="fault-location">KM 1245.120</span>
+                                <span class="fault-type">Gauge</span>
+                                <span class="fault-distance">2.2 km behind</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts Module -->
+            <div id="alerts" class="module hidden">
+                <div class="module-header">
+                    <h2>Alert Management</h2>
+                    <div class="alert-summary">
+                        <span class="alert-summary-item critical">Critical: 1</span>
+                        <span class="alert-summary-item high">High: 1</span>
+                        <span class="alert-summary-item medium">Medium: 1</span>
+                        <span class="alert-summary-item low">Low: 0</span>
+                    </div>
+                </div>
+
+                <div class="alerts-container">
+                    <div class="alerts-filters">
+                        <button class="filter-btn active" data-filter="all">All Alerts</button>
+                        <button class="filter-btn" data-filter="critical">Critical</button>
+                        <button class="filter-btn" data-filter="high">High</button>
+                        <button class="filter-btn" data-filter="medium">Medium</button>
+                        <button class="filter-btn" data-filter="acknowledged">Acknowledged</button>
+                    </div>
+
+                    <div class="alerts-table">
+                        <div class="alert-item critical" data-severity="critical">
+                            <div class="alert-icon">🚨</div>
+                            <div class="alert-details">
+                                <div class="alert-title">Severe alignment deviation</div>
+                                <div class="alert-meta">
+                                    <span class="alert-time">10:38:47</span>
+                                    <span class="alert-location">KM 1244.650</span>
+                                    <span class="alert-type">Track Alignment</span>
+                                </div>
+                            </div>
+                            <div class="alert-status under-investigation">Under Investigation</div>
+                            <button class="alert-action btn btn--sm btn--primary">Details</button>
+                        </div>
+
+                        <div class="alert-item high" data-severity="high">
+                            <div class="alert-icon">⚠️</div>
+                            <div class="alert-details">
+                                <div class="alert-title">Gauge widening detected</div>
+                                <div class="alert-meta">
+                                    <span class="alert-time">10:45:32</span>
+                                    <span class="alert-location">KM 1245.120</span>
+                                    <span class="alert-type">Track Geometry</span>
+                                </div>
+                            </div>
+                            <div class="alert-status active">Active</div>
+                            <button class="alert-action btn btn--sm btn--primary">Acknowledge</button>
+                        </div>
+
+                        <div class="alert-item medium" data-severity="medium">
+                            <div class="alert-icon">🔶</div>
+                            <div class="alert-details">
+                                <div class="alert-title">Lateral wear exceeding 0.15mm</div>
+                                <div class="alert-meta">
+                                    <span class="alert-time">10:42:15</span>
+                                    <span class="alert-location">KM 1244.890</span>
+                                    <span class="alert-type">Rail Wear</span>
+                                </div>
+                            </div>
+                            <div class="alert-status acknowledged">Acknowledged</div>
+                            <button class="alert-action btn btn--sm btn--secondary">View</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Track Analysis Module -->
+            <div id="track-analysis" class="module hidden">
+                <div class="module-header">
+                    <h2>Track Analysis & Reports</h2>
+                    <div class="analysis-controls">
+                        <select class="form-control" id="analysisRange">
+                            <option value="last-1km">Last 1 KM</option>
+                            <option value="last-5km">Last 5 KM</option>
+                            <option value="last-10km">Last 10 KM</option>
+                        </select>
+                        <button class="btn btn--primary" id="generateReport">Generate Report</button>
+                    </div>
+                </div>
+
+                <div class="analysis-grid">
+                    <div class="chart-card">
+                        <h3>Track Geometry Analysis</h3>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="geometryChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h3>Rail Wear Analysis</h3>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="wearChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="compliance-status">
+                        <h3>Standards Compliance</h3>
+                        <div class="compliance-item">
+                            <span class="compliance-standard">EN 13848 Part 1</span>
+                            <span class="compliance-result passed">Passed</span>
+                        </div>
+                        <div class="compliance-item">
+                            <span class="compliance-standard">EN 13848 Part 2</span>
+                            <span class="compliance-result passed">Passed</span>
+                        </div>
+                        <div class="compliance-item">
+                            <span class="compliance-standard">RDSO TM/IM/448</span>
+                            <span class="compliance-result warning">Warning</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Control Module -->
+            <div id="system-control" class="module hidden">
+                <div class="module-header">
+                    <h2>System Control Panel</h2>
+                    <div class="system-status-indicator">
+                        <span class="status-dot operational"></span>
+                        All Systems Operational
+                    </div>
+                </div>
+
+                <div class="control-grid">
+                    <div class="control-section">
+                        <h3>Recording Control</h3>
+                        <div class="control-item">
+                            <button class="btn btn--lg btn--primary" id="startRecording">
+                                <span class="btn-icon">▶️</span>
+                                Start Recording
+                            </button>
+                            <button class="btn btn--lg btn--secondary" id="pauseRecording">
+                                <span class="btn-icon">⏸️</span>
+                                Pause
+                            </button>
+                            <button class="btn btn--lg btn--outline" id="stopRecording">
+                                <span class="btn-icon">⏹️</span>
+                                Stop
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Sampling Configuration</h3>
+                        <div class="form-group">
+                            <label class="form-label">Sampling Interval</label>
+                            <select class="form-control" id="samplingInterval">
+                                <option value="0.25">0.25 m</option>
+                                <option value="0.50">0.50 m</option>
+                                <option value="1.00">1.00 m</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Speed Range</label>
+                            <select class="form-control" id="speedRange">
+                                <option value="0-50">0-50 km/h</option>
+                                <option value="0-100">0-100 km/h</option>
+                                <option value="0-200">0-200 km/h</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Data Export</h3>
+                        <div class="export-options">
+                            <button class="btn btn--outline export-btn" data-format="csv">
+                                <span class="btn-icon">📊</span>
+                                Export CSV
+                            </button>
+                            <button class="btn btn--outline export-btn" data-format="xml">
+                                <span class="btn-icon">📄</span>
+                                Export XML
+                            </button>
+                            <button class="btn btn--outline export-btn" data-format="database">
+                                <span class="btn-icon">🗄️</span>
+                                Database
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h3>System Diagnostics</h3>
+                        <div class="diagnostics-grid">
+                            <div class="diagnostic-item">
+                                <span class="diagnostic-label">Data Storage:</span>
+                                <span class="diagnostic-value">78%</span>
+                            </div>
+                            <div class="diagnostic-item">
+                                <span class="diagnostic-label">Communication:</span>
+                                <span class="diagnostic-value connected">Connected</span>
+                            </div>
+                            <div class="diagnostic-item">
+                                <span class="diagnostic-label">Sensor Calibration:</span>
+                                <span class="diagnostic-value valid">Valid</span>
+                            </div>
+                            <div class="diagnostic-item">
+                                <span class="diagnostic-label">Temperature:</span>
+                                <span class="diagnostic-value">45°C</span>
+                            </div>
+                        </div>
+                        <button class="btn btn--primary" id="runDiagnostics">Run Full Diagnostics</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Diagrams Module -->
+            <div id="system-diagrams" class="module hidden">
+                <div class="module-header">
+                    <h2>System Architecture & Diagrams</h2>
+                    <div class="diagram-tabs">
+                        <button class="diagram-tab active" data-diagram="architecture">Architecture</button>
+                        <button class="diagram-tab" data-diagram="flowchart">Data Flow</button>
+                        <button class="diagram-tab" data-diagram="hardware">Hardware</button>
+                    </div>
+                </div>
+
+                <div class="diagrams-container">
+                    <div id="architecture-diagram" class="diagram-content active">
+                        <h3>ITMS System Architecture</h3>
+                        <div class="diagram-placeholder">
+                            <div class="diagram-icon">🏗️</div>
+                            <p>Complete system architecture showing sensor layer, data acquisition, processing, communication, application and storage layers with data flow connections.</p>
+                        </div>
+                    </div>
+
+                    <div id="flowchart-diagram" class="diagram-content hidden">
+                        <h3>ITMS Data Processing Workflow</h3>
+                        <div class="diagram-placeholder">
+                            <div class="diagram-icon">📊</div>
+                            <p>Detailed flowchart showing the complete data flow from sensor collection to reporting and alerts generation.</p>
+                        </div>
+                    </div>
+
+                    <div id="hardware-diagram" class="diagram-content hidden">
+                        <h3>ITMS Hardware Connection Diagram</h3>
+                        <div class="diagram-placeholder">
+                            <div class="diagram-icon">🔌</div>
+                            <p>Comprehensive hardware connection diagram showing all sensor interfaces, power distribution, and communication pathways.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-branding">
+                    <span class="footer-logo">🚄</span>
+                    <div class="footer-text">
+                        <div class="footer-brand">Made by Team AAMCA</div>
+                        <div class="footer-website">
+                            <a href="https://www.teamaamca.ai" target="_blank">www.teamaamca.ai</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-section">
+                <div class="footer-info">
+                    <div class="footer-version">ITMS Dashboard v2.1</div>
+                    <div class="footer-copyright">© 2025 Team AAMCA. All rights reserved.</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
